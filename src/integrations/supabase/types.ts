@@ -14,16 +14,267 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      canteens: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_approved: boolean | null
+          location: string | null
+          name: string
+          opening_hours: string | null
+          staff_user_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean | null
+          location?: string | null
+          name: string
+          opening_hours?: string | null
+          staff_user_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_approved?: boolean | null
+          location?: string | null
+          name?: string
+          opening_hours?: string | null
+          staff_user_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      menu_categories: {
+        Row: {
+          created_at: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      menu_items: {
+        Row: {
+          canteen_id: string
+          category_id: string | null
+          created_at: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          is_vegetarian: boolean | null
+          name: string
+          preparation_time: number | null
+          price: number
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          canteen_id: string
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          is_vegetarian?: boolean | null
+          name: string
+          preparation_time?: number | null
+          price: number
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          canteen_id?: string
+          category_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          is_vegetarian?: boolean | null
+          name?: string
+          preparation_time?: number | null
+          price?: number
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_items_canteen_id_fkey"
+            columns: ["canteen_id"]
+            isOneToOne: false
+            referencedRelation: "canteens"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "menu_items_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "menu_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      order_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          menu_item_id: string
+          order_id: string
+          quantity: number
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          menu_item_id: string
+          order_id: string
+          quantity: number
+          unit_price: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          menu_item_id?: string
+          order_id?: string
+          quantity?: number
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "order_items_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "order_items_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      orders: {
+        Row: {
+          canteen_id: string
+          created_at: string | null
+          customer_id: string
+          estimated_pickup_time: string | null
+          id: string
+          notes: string | null
+          order_number: number
+          status: Database["public"]["Enums"]["order_status"] | null
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          canteen_id: string
+          created_at?: string | null
+          customer_id: string
+          estimated_pickup_time?: string | null
+          id?: string
+          notes?: string | null
+          order_number: number
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          canteen_id?: string
+          created_at?: string | null
+          customer_id?: string
+          estimated_pickup_time?: string | null
+          id?: string
+          notes?: string | null
+          order_number?: number
+          status?: Database["public"]["Enums"]["order_status"] | null
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "orders_canteen_id_fkey"
+            columns: ["canteen_id"]
+            isOneToOne: false
+            referencedRelation: "canteens"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          full_name: string
+          id: string
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          full_name: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          full_name?: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_order_number: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      get_user_role: {
+        Args: { user_uuid: string }
+        Returns: Database["public"]["Enums"]["user_role"]
+      }
     }
     Enums: {
-      [_ in never]: never
+      order_status:
+        | "pending"
+        | "preparing"
+        | "ready_for_pickup"
+        | "completed"
+        | "cancelled"
+      user_role: "customer" | "canteen_staff" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +401,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      order_status: [
+        "pending",
+        "preparing",
+        "ready_for_pickup",
+        "completed",
+        "cancelled",
+      ],
+      user_role: ["customer", "canteen_staff", "admin"],
+    },
   },
 } as const
