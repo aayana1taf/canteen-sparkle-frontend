@@ -112,60 +112,28 @@ export const useOrders = () => {
     try {
       const total_amount = items.reduce((sum, item) => sum + (item.unit_price * item.quantity), 0);
 
-      // Create the order with raw SQL to bypass TypeScript issues
-      const { data: order, error: orderError } = await supabase.rpc('create_order', {
-        p_customer_id: user.id,
-        p_canteen_id: canteenId,
-        p_total_amount: total_amount,
-        p_notes: notes || null,
-        p_estimated_pickup_time: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-      });
+      // Generate a simple order number for now
+      const orderNumber = Math.floor(Math.random() * 10000) + 1;
+
+      // Create the order directly
+      const { data: order, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          customer_id: user.id,
+          canteen_id: canteenId,
+          total_amount,
+          notes: notes || null,
+          estimated_pickup_time: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+          order_number: orderNumber,
+        })
+        .select()
+        .single();
 
       if (orderError) {
-        // Fallback to direct insert with order_number
-        const { data: fallbackOrder, error: fallbackError } = await supabase
-          .from('orders')
-          .insert({
-            customer_id: user.id,
-            canteen_id: canteenId,
-            total_amount,
-            notes: notes || null,
-            estimated_pickup_time: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-            order_number: Math.floor(Math.random() * 1000) + 1, // Temporary fallback
-          })
-          .select()
-          .single();
-
-        if (fallbackError) {
-          throw fallbackError;
-        }
-
-        // Create order items
-        const orderItems = items.map(item => ({
-          order_id: fallbackOrder.id,
-          menu_item_id: item.menu_item_id,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-        }));
-
-        const { error: itemsError } = await supabase
-          .from('order_items')
-          .insert(orderItems);
-
-        if (itemsError) {
-          throw itemsError;
-        }
-
-        toast({
-          title: "Order placed successfully!",
-          description: `Order #${fallbackOrder.order_number} has been placed`,
-        });
-
-        fetchOrders();
-        return { error: null, order: fallbackOrder };
+        throw orderError;
       }
 
-      // If RPC worked, create order items
+      // Create order items
       const orderItems = items.map(item => ({
         order_id: order.id,
         menu_item_id: item.menu_item_id,

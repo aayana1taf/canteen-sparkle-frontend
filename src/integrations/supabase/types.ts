@@ -258,6 +258,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_order: {
+        Args: {
+          p_canteen_id: string
+          p_customer_id: string
+          p_estimated_pickup_time?: string
+          p_notes?: string
+          p_total_amount: number
+        }
+        Returns: {
+          canteen_id: string
+          created_at: string
+          customer_id: string
+          estimated_pickup_time: string
+          id: string
+          notes: string
+          order_number: number
+          status: Database["public"]["Enums"]["order_status"]
+          total_amount: number
+        }[]
+      }
       generate_order_number: {
         Args: Record<PropertyKey, never>
         Returns: number
