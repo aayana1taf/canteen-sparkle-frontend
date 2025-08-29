@@ -5,14 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth, UserRole } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
 
 const AuthPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [role, setRole] = useState<UserRole>('customer');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const { user, signUp, signIn } = useAuth();
@@ -57,7 +60,7 @@ const AuthPage = () => {
       return;
     }
 
-    const { error } = await signUp(email, password, fullName);
+    const { error } = await signUp(email, password, fullName, role, phone);
     
     if (error) {
       setError(error.message);
@@ -74,6 +77,19 @@ const AuthPage = () => {
     }
     
     setLoading(false);
+  };
+
+  const getRoleDescription = (role: UserRole) => {
+    switch (role) {
+      case 'customer':
+        return 'Browse canteens and place orders';
+      case 'canteen_staff':
+        return 'Manage your canteen and orders';
+      case 'admin':
+        return 'Full system administration access';
+      default:
+        return '';
+    }
   };
 
   return (
@@ -158,6 +174,47 @@ const AuthPage = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone (Optional)</Label>
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="role">Account Type</Label>
+                    <Select value={role} onValueChange={(value: UserRole) => setRole(value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select your role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="customer">
+                          <div className="flex flex-col">
+                            <span>Customer</span>
+                            <span className="text-xs text-muted-foreground">Browse canteens and place orders</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="canteen_staff">
+                          <div className="flex flex-col">
+                            <span>Canteen Staff</span>
+                            <span className="text-xs text-muted-foreground">Manage your canteen and orders</span>
+                          </div>
+                        </SelectItem>
+                        <SelectItem value="admin">
+                          <div className="flex flex-col">
+                            <span>Administrator</span>
+                            <span className="text-xs text-muted-foreground">Full system administration access</span>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-muted-foreground">
+                      {getRoleDescription(role)}
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
