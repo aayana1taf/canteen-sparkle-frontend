@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, TrendingUp, Star } from 'lucide-react';
 import { Header } from '@/components/ui/header';
@@ -6,19 +6,91 @@ import { CanteenCard } from '@/components/ui/canteen-card';
 import { MenuItemCard } from '@/components/ui/menu-item-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { canteens, getPopularItems, searchMenuItems } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 import heroImage from '@/assets/hero-image.jpg';
 
-export default function HomePage() {
-  const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
-  const popularItems = getPopularItems();
+interface Canteen {
+  id: string;
+  name: string;
+  description?: string;
+  location?: string;
+  opening_hours?: string;
+}
 
-  const handleSearch = (query: string) => {
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  description?: string;
+  rating: number;
+  image_url?: string;
+  preparation_time: number;
+  canteen: { name: string };
+}
+
+export default function HomePage() {
+  const [searchResults, setSearchResults] = useState<MenuItem[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const [canteens, setCanteens] = useState<Canteen[]>([]);
+  const [popularItems, setPopularItems] = useState<MenuItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch approved canteens
+        const { data: canteenData, error: canteenError } = await supabase
+          .from('canteens')
+          .select('*')
+          .eq('is_approved', true);
+
+        if (canteenError) throw canteenError;
+        setCanteens(canteenData || []);
+
+        // Fetch popular menu items (highest rated)
+        const { data: menuData, error: menuError } = await supabase
+          .from('menu_items')
+          .select(`
+            *,
+            canteen:canteens(name)
+          `)
+          .eq('is_available', true)
+          .order('rating', { ascending: false })
+          .limit(6);
+
+        if (menuError) throw menuError;
+        setPopularItems(menuData || []);
+
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const handleSearch = async (query: string) => {
     if (query.trim()) {
-      const results = searchMenuItems(query);
-      setSearchResults(results);
-      setIsSearching(true);
+      try {
+        const { data, error } = await supabase
+          .from('menu_items')
+          .select(`
+            *,
+            canteen:canteens(name)
+          `)
+          .eq('is_available', true)
+          .or(`name.ilike.%${query}%,description.ilike.%${query}%`);
+
+        if (error) throw error;
+        setSearchResults(data || []);
+        setIsSearching(true);
+      } catch (error) {
+        console.error('Error searching:', error);
+        setSearchResults([]);
+        setIsSearching(true);
+      }
     } else {
       setSearchResults([]);
       setIsSearching(false);
@@ -40,7 +112,7 @@ export default function HomePage() {
             NED University <span className="text-primary">Canteens</span>
           </h1>
           <p className="text-lg md:text-xl mb-8 max-w-2xl mx-auto animate-slide-up">
-            Discover delicious food from GCR, DMS, and SFC canteens. Order online and enjoy fresh meals on campus.
+            Discover delicious food from campus canteens. Order online and enjoy fresh meals on campus.
           </p>
           
           {/* Hero Search */}
@@ -83,7 +155,19 @@ export default function HomePage() {
             {searchResults.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {searchResults.map((item) => (
-                  <MenuItemCard key={item.id} item={item} />
+                  <MenuItemCard key={item.id} item={{
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    description: item.description || '',
+                    category: 'Search Result',
+                    image: item.image_url,
+                    available: true,
+                    rating: item.rating,
+                    reviews: 0,
+                    preparationTime: `${item.preparation_time} mins`,
+                    canteen: item.canteen.name
+                  }} />
                 ))}
               </div>
             ) : (
@@ -103,11 +187,30 @@ export default function HomePage() {
               <TrendingUp className="h-6 w-6 text-primary" />
               <h2 className="text-2xl font-bold text-foreground">Popular Items</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {popularItems.map((item) => (
-                <MenuItemCard key={item.id} item={item} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground mt-4">Loading popular items...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {popularItems.map((item) => (
+                  <MenuItemCard key={item.id} item={{
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    description: item.description || '',
+                    category: 'Popular',
+                    image: item.image_url,
+                    available: true,
+                    rating: item.rating,
+                    reviews: 0,
+                    preparationTime: `${item.preparation_time} mins`,
+                    canteen: item.canteen.name
+                  }} />
+                ))}
+              </div>
+            )}
           </section>
         )}
 
@@ -118,16 +221,33 @@ export default function HomePage() {
               <Star className="h-6 w-6 text-primary" />
               <h2 className="text-2xl font-bold text-foreground">Our Canteens</h2>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {canteens.map((canteen) => (
-                <CanteenCard key={canteen.id} canteen={canteen} />
-              ))}
-            </div>
+            {loading ? (
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="text-muted-foreground mt-4">Loading canteens...</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {canteens.map((canteen) => (
+                  <CanteenCard key={canteen.id} canteen={{
+                    id: canteen.id,
+                    name: canteen.name,
+                    fullName: canteen.name,
+                    description: canteen.description || '',
+                    image: '/placeholder.svg',
+                    color: 'primary',
+                    hours: canteen.opening_hours || 'Check locally',
+                    location: canteen.location || 'Campus',
+                    specialties: []
+                  }} />
+                ))}
+              </div>
+            )}
           </section>
         )}
 
         {/* Footer CTA */}
-        {!isSearching && (
+        {!isSearching && !loading && (
           <section className="mt-16 text-center">
             <div className="bg-gradient-primary rounded-2xl p-8 text-primary-foreground">
               <h3 className="text-2xl font-bold mb-4">Ready to Order?</h3>
