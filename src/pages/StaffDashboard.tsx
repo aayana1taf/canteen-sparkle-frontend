@@ -3,11 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/ui/header';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrders, OrderStatus } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
-import { ChefHat, Clock, DollarSign, Package, TrendingUp, Users } from 'lucide-react';
+import { MenuManagement } from '@/components/ui/menu-management';
+import { ChefHat, Clock, DollarSign, Package, TrendingUp, Users, Settings, Store } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const StaffDashboard = () => {
@@ -139,97 +141,157 @@ const StaffDashboard = () => {
           </Card>
         </div>
 
-        {/* Orders Management */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ChefHat className="h-5 w-5" />
-              Order Management
-            </CardTitle>
-            <CardDescription>
-              Manage incoming orders and update their status
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map(i => (
-                  <div key={i} className="h-20 bg-muted rounded animate-pulse" />
-                ))}
-              </div>
-            ) : orders.length > 0 ? (
-              <div className="space-y-4">
-                {orders.map((order) => (
-                  <div key={order.id} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <h3 className="font-semibold">Order #{order.order_number}</h3>
-                        <Badge variant="secondary" className={`text-white ${getStatusColor(order.status)}`}>
-                          {order.status.replace('_', ' ')}
-                        </Badge>
-                        <span className="text-sm text-muted-foreground">
-                          Rs. {order.total_amount}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Select
-                          value={order.status}
-                          onValueChange={(value: OrderStatus) => handleStatusUpdate(order.id, value)}
-                          disabled={getStatusOptions(order.status).length === 0}
-                        >
-                          <SelectTrigger className="w-40">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value={order.status}>{order.status.replace('_', ' ')}</SelectItem>
-                            {getStatusOptions(order.status).map(status => (
-                              <SelectItem key={status} value={status}>
-                                {status.replace('_', ' ')}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="text-sm text-muted-foreground">
-                        <strong>Items:</strong>
-                      </div>
-                      <div className="space-y-1">
-                        {order.order_items.map((item) => (
-                          <div key={item.id} className="flex justify-between text-sm">
-                            <span>{item.quantity}x {item.menu_item.name}</span>
-                            <span>Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+        {/* Management Tabs */}
+        <Tabs defaultValue="orders" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+            <TabsTrigger value="menu">Menu</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="orders">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ChefHat className="h-5 w-5" />
+                  Order Management
+                </CardTitle>
+                <CardDescription>
+                  Manage incoming orders and update their status
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <div className="space-y-3">
+                    {[1, 2, 3].map(i => (
+                      <div key={i} className="h-20 bg-muted rounded animate-pulse" />
+                    ))}
+                  </div>
+                ) : orders.length > 0 ? (
+                  <div className="space-y-4">
+                    {orders.map((order) => (
+                      <div key={order.id} className="p-4 border rounded-lg">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <h3 className="font-semibold">Order #{order.order_number}</h3>
+                            <Badge variant="secondary" className={`text-white ${getStatusColor(order.status)}`}>
+                              {order.status.replace('_', ' ')}
+                            </Badge>
+                            <span className="text-sm text-muted-foreground">
+                              Rs. {order.total_amount}
+                            </span>
                           </div>
-                        ))}
-                      </div>
-                      
-                      {order.notes && (
-                        <div className="text-sm">
-                          <strong>Notes:</strong> {order.notes}
+                          <div className="flex items-center gap-2">
+                            <Select
+                              value={order.status}
+                              onValueChange={(value: OrderStatus) => handleStatusUpdate(order.id, value)}
+                              disabled={getStatusOptions(order.status).length === 0}
+                            >
+                              <SelectTrigger className="w-40">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value={order.status}>{order.status.replace('_', ' ')}</SelectItem>
+                                {getStatusOptions(order.status).map(status => (
+                                  <SelectItem key={status} value={status}>
+                                    {status.replace('_', ' ')}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
                         </div>
-                      )}
-                      
-                      <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
-                        <span>Ordered: {new Date(order.created_at).toLocaleString()}</span>
-                        {order.estimated_pickup_time && (
-                          <span>Pickup: {new Date(order.estimated_pickup_time).toLocaleString()}</span>
-                        )}
+                        
+                        <div className="space-y-2">
+                          <div className="text-sm text-muted-foreground">
+                            <strong>Items:</strong>
+                          </div>
+                          <div className="space-y-1">
+                            {order.order_items.map((item) => (
+                              <div key={item.id} className="flex justify-between text-sm">
+                                <span>{item.quantity}x {item.menu_item.name}</span>
+                                <span>Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          {order.notes && (
+                            <div className="text-sm">
+                              <strong>Notes:</strong> {order.notes}
+                            </div>
+                          )}
+                          
+                          <div className="flex justify-between text-xs text-muted-foreground pt-2 border-t">
+                            <span>Ordered: {new Date(order.created_at).toLocaleString()}</span>
+                            {order.estimated_pickup_time && (
+                              <span>Pickup: {new Date(order.estimated_pickup_time).toLocaleString()}</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-medium mb-2">No orders yet</h3>
+                    <p className="text-muted-foreground">Orders will appear here when customers place them.</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="menu">
+            <MenuManagement canteenId={canteen?.id} />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Store className="h-5 w-5" />
+                  Canteen Settings
+                </CardTitle>
+                <CardDescription>
+                  Manage your canteen information and preferences
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <h3 className="font-semibold mb-2">Canteen Information</h3>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Name:</strong> {canteen?.name || 'Not set'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Location:</strong> {canteen?.location || 'Not set'}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        <strong>Hours:</strong> {canteen?.opening_hours || 'Not set'}
+                      </p>
+                    </div>
+                    <div>
+                      <h3 className="font-semibold mb-2">Status</h3>
+                      <Badge 
+                        variant={canteen?.is_approved ? "default" : "destructive"}
+                        className={canteen?.is_approved ? "bg-green-500" : "bg-orange-500"}
+                      >
+                        {canteen?.is_approved ? 'Approved' : 'Pending Approval'}
+                      </Badge>
+                      {!canteen?.is_approved && (
+                        <p className="text-xs text-muted-foreground mt-2">
+                          Your canteen is waiting for admin approval before it becomes visible to customers.
+                        </p>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-center py-8">
-                <Package className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-                <h3 className="text-lg font-medium mb-2">No orders yet</h3>
-                <p className="text-muted-foreground">Orders will appear here when customers place them.</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </main>
     </div>
   );

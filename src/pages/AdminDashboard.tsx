@@ -307,10 +307,10 @@ const AdminDashboard = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Package className="h-5 w-5" />
-                  Recent Orders
+                  System-wide Orders
                 </CardTitle>
                 <CardDescription>
-                  System-wide order overview
+                  Monitor all orders across all canteens with real-time updates
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -320,20 +320,34 @@ const AdminDashboard = () => {
                       <div key={i} className="h-16 bg-muted rounded animate-pulse" />
                     ))}
                   </div>
-                ) : orders.slice(0, 10).map((order) => (
+                ) : orders.slice(0, 20).map((order) => (
                   <div key={order.id} className="flex items-center justify-between p-4 border rounded-lg mb-4">
                     <div className="flex-1">
-                      <h3 className="font-semibold">Order #{order.order_number}</h3>
+                      <div className="flex items-center gap-3 mb-1">
+                        <h3 className="font-semibold">Order #{order.order_number}</h3>
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-white ${
+                            order.status === 'pending' ? 'bg-yellow-500' :
+                            order.status === 'preparing' ? 'bg-blue-500' :
+                            order.status === 'ready_for_pickup' ? 'bg-green-500' :
+                            order.status === 'completed' ? 'bg-gray-500' :
+                            'bg-red-500'
+                          }`}
+                        >
+                          {order.status.replace('_', ' ')}
+                        </Badge>
+                      </div>
                       <p className="text-sm text-muted-foreground">{order.canteen.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(order.created_at).toLocaleString()}
+                        {order.order_items.length} items • {new Date(order.created_at).toLocaleString()}
                       </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold">Rs. {order.total_amount}</p>
-                      <Badge variant="secondary" className="text-white bg-blue-500">
-                        {order.status.replace('_', ' ')}
-                      </Badge>
+                      <p className="text-xs text-muted-foreground">
+                        Customer Order
+                      </p>
                     </div>
                   </div>
                 ))}

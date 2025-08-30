@@ -5,6 +5,7 @@ import { Button } from './button';
 import { Input } from './input';
 import { Badge } from './badge';
 import { ProfileDropdown } from './profile-dropdown';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   cartItemsCount?: number;
@@ -15,6 +16,7 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { profile } = useAuth();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,63 +56,47 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
 
           {/* Navigation - Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
-            <Link 
-              to="/" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActive('/') ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              Home
-            </Link>
-            <Link 
-              to="/canteen/gcr" 
-              className={`text-sm font-medium transition-colors hover:text-gcr ${
-                isActive('/canteen/gcr') ? 'text-gcr' : 'text-muted-foreground'
-              }`}
-            >
-              GCR
-            </Link>
-            <Link 
-              to="/canteen/dms" 
-              className={`text-sm font-medium transition-colors hover:text-dms ${
-                isActive('/canteen/dms') ? 'text-dms' : 'text-muted-foreground'
-              }`}
-            >
-              DMS
-            </Link>
-            <Link 
-              to="/canteen/sfc" 
-              className={`text-sm font-medium transition-colors hover:text-sfc ${
-                isActive('/canteen/sfc') ? 'text-sfc' : 'text-muted-foreground'
-              }`}
-            >
-              SFC
-            </Link>
-            <Link 
-              to="/orders" 
-              className={`text-sm font-medium transition-colors hover:text-primary ${
-                isActive('/orders') ? 'text-primary' : 'text-muted-foreground'
-              }`}
-            >
-              Orders
-            </Link>
+            {/* Only show canteen browsing for customers */}
+            {profile?.role === 'customer' && (
+              <>
+                <Link 
+                  to="/browse" 
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive('/browse') ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                >
+                  Browse Canteens
+                </Link>
+                <Link 
+                  to="/orders" 
+                  className={`text-sm font-medium transition-colors hover:text-primary ${
+                    isActive('/orders') ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                >
+                  My Orders
+                </Link>
+              </>
+            )}
           </nav>
 
           {/* Cart, Profile and Mobile Menu */}
           <div className="flex items-center space-x-4">
-            <Link to="/cart">
-              <Button variant="outline" size="sm" className="relative">
-                <ShoppingCart className="h-4 w-4" />
-                {cartItemsCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                  >
-                    {cartItemsCount}
-                  </Badge>
-                )}
-              </Button>
-            </Link>
+            {/* Only show cart for customers */}
+            {profile?.role === 'customer' && (
+              <Link to="/cart">
+                <Button variant="outline" size="sm" className="relative">
+                  <ShoppingCart className="h-4 w-4" />
+                  {cartItemsCount > 0 && (
+                    <Badge 
+                      variant="destructive" 
+                      className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                    >
+                      {cartItemsCount}
+                    </Badge>
+                  )}
+                </Button>
+              </Link>
+            )}
             
             <ProfileDropdown />
 
@@ -148,51 +134,29 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
 
             {/* Mobile Navigation */}
             <nav className="flex flex-col space-y-2">
-              <Link 
-                to="/" 
-                className={`text-sm font-medium py-2 transition-colors hover:text-primary ${
-                  isActive('/') ? 'text-primary' : 'text-muted-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link 
-                to="/canteen/gcr" 
-                className={`text-sm font-medium py-2 transition-colors hover:text-gcr ${
-                  isActive('/canteen/gcr') ? 'text-gcr' : 'text-muted-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                GCR Canteen
-              </Link>
-              <Link 
-                to="/canteen/dms" 
-                className={`text-sm font-medium py-2 transition-colors hover:text-dms ${
-                  isActive('/canteen/dms') ? 'text-dms' : 'text-muted-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                DMS Canteen
-              </Link>
-              <Link 
-                to="/canteen/sfc" 
-                className={`text-sm font-medium py-2 transition-colors hover:text-sfc ${
-                  isActive('/canteen/sfc') ? 'text-sfc' : 'text-muted-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                SFC Canteen
-              </Link>
-              <Link 
-                to="/orders" 
-                className={`text-sm font-medium py-2 transition-colors hover:text-primary ${
-                  isActive('/orders') ? 'text-primary' : 'text-muted-foreground'
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                My Orders
-              </Link>
+              {/* Only show customer navigation for customers */}
+              {profile?.role === 'customer' && (
+                <>
+                  <Link 
+                    to="/browse" 
+                    className={`text-sm font-medium py-2 transition-colors hover:text-primary ${
+                      isActive('/browse') ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Browse Canteens
+                  </Link>
+                  <Link 
+                    to="/orders" 
+                    className={`text-sm font-medium py-2 transition-colors hover:text-primary ${
+                      isActive('/orders') ? 'text-primary' : 'text-muted-foreground'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    My Orders
+                  </Link>
+                </>
+              )}
             </nav>
           </div>
         )}

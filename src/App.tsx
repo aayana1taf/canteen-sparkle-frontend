@@ -12,6 +12,7 @@ import OrdersPage from "./pages/OrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
+import StaffWelcome from "./pages/StaffWelcome";
 import AdminDashboard from "./pages/AdminDashboard";
 import CartPage from "./pages/CartPage";
 import NotFound from "./pages/NotFound";
@@ -35,7 +36,7 @@ const RoleBasedRedirect = () => {
     case 'admin':
       return <AdminDashboard />;
     case 'canteen_staff':
-      return <StaffDashboard />;
+      return <Navigate to="/staff" replace />;
     case 'customer':
     default:
       return <CustomerDashboard />;
@@ -116,6 +117,11 @@ const AppContent = () => {
       <Route path="/dashboard/customer" element={
         <ProtectedRoute>
           <CustomerDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/staff" element={
+        <ProtectedRoute>
+          <StaffWelcome />
         </ProtectedRoute>
       } />
       <Route path="/dashboard/staff" element={
