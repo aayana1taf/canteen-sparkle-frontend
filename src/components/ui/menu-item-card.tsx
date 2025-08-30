@@ -2,7 +2,20 @@ import { Star, Clock, Plus, Minus } from 'lucide-react';
 import { Button } from './button';
 import { Card, CardContent } from './card';
 import { Badge } from './badge';
-import { MenuItem } from '@/data/mockData';
+interface MenuItem {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  image?: string;
+  available: boolean;
+  rating: number;
+  reviews: number;
+  isPopular?: boolean;
+  preparationTime: string;
+  canteen: string;
+}
 
 interface MenuItemCardProps {
   item: MenuItem;
@@ -19,13 +32,22 @@ export const MenuItemCard = ({
   onUpdateQuantity,
   showQuantityControls = false 
 }: MenuItemCardProps) => {
-  const canteenColor = `${item.canteen.toLowerCase()}` as 'gcr' | 'dms' | 'sfc';
-
   return (
     <Card className="overflow-hidden hover:shadow-elevated transition-all duration-300 group">
       <CardContent className="p-0">
         {/* Image Placeholder */}
-        <div className={`h-48 bg-gradient-to-br from-${canteenColor} to-${canteenColor}/80 relative overflow-hidden`}>
+        <div className="h-48 bg-gradient-to-br from-primary to-primary/80 relative overflow-hidden">
+          {item.image ? (
+            <img 
+              src={item.image} 
+              alt={item.name}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-6xl opacity-50">🍽️</span>
+            </div>
+          )}
           <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
           <div className="absolute top-4 left-4 flex gap-2">
             {item.isPopular && (
@@ -38,11 +60,6 @@ export const MenuItemCard = ({
                 Out of Stock
               </Badge>
             )}
-          </div>
-          
-          {/* Food item placeholder */}
-          <div className="absolute bottom-4 right-4 text-white/80 text-6xl">
-            🍽️
           </div>
         </div>
 

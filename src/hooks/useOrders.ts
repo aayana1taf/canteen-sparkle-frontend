@@ -206,6 +206,28 @@ export const useOrders = () => {
     }
   }, [user, profile]);
 
+  // Auto-update orders every 30 seconds
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(async () => {
+      try {
+        // Call the edge function to update order statuses
+        const { error } = await supabase.functions.invoke('auto-update-orders');
+        if (error) {
+          console.error('Error auto-updating orders:', error);
+        } else {
+          // Refetch orders after auto-update
+          fetchOrders();
+        }
+      } catch (error) {
+        console.error('Error calling auto-update function:', error);
+      }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   // Set up real-time subscriptions for order updates
   useEffect(() => {
     if (!user) return;
