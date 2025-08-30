@@ -23,7 +23,7 @@ interface MenuItem {
   is_available: boolean;
   preparation_time: number;
   image_url?: string;
-  category?: { name: string };
+  menu_categories?: { name: string };
 }
 
 interface Category {
