@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import CartPage from "./pages/CartPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -55,6 +57,83 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+// App component with cart state
+const AppContent = () => {
+  // Simple cart state - in a real app, this would be in a context or store
+  const [cartItems, setCartItems] = useState<any[]>([]);
+
+  const updateCartQuantity = (itemId: string, quantity: number) => {
+    if (quantity <= 0) {
+      setCartItems(items => items.filter(item => item.id !== itemId));
+    } else {
+      setCartItems(items => 
+        items.map(item => 
+          item.id === itemId ? { ...item, quantity } : item
+        )
+      );
+    }
+  };
+
+  const clearCart = () => setCartItems([]);
+  
+  const placeOrder = () => {
+    // Handle order placement
+    setCartItems([]);
+    // toast success message
+  };
+
+  return (
+    <Routes>
+      <Route path="/auth" element={<AuthPage />} />
+      <Route path="/" element={<RoleBasedRedirect />} />
+      <Route path="/browse" element={<Index />} />
+      <Route path="/canteen/:canteenId" element={
+        <ProtectedRoute>
+          <CanteenPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/orders" element={
+        <ProtectedRoute>
+          <OrdersPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/profile" element={
+        <ProtectedRoute>
+          <ProfilePage />
+        </ProtectedRoute>
+      } />
+      <Route 
+        path="/cart" 
+        element={
+          <CartPage 
+            items={cartItems}
+            onUpdateQuantity={updateCartQuantity}
+            onClearCart={clearCart}
+            onPlaceOrder={placeOrder}
+          />
+        } 
+      />
+      <Route path="/dashboard/customer" element={
+        <ProtectedRoute>
+          <CustomerDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/staff" element={
+        <ProtectedRoute>
+          <StaffDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/admin" element={
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      } />
+      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
@@ -62,43 +141,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/" element={<RoleBasedRedirect />} />
-            <Route path="/browse" element={<Index />} />
-            <Route path="/canteen/:canteenId" element={
-              <ProtectedRoute>
-                <CanteenPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/orders" element={
-              <ProtectedRoute>
-                <OrdersPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/customer" element={
-              <ProtectedRoute>
-                <CustomerDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/staff" element={
-              <ProtectedRoute>
-                <StaffDashboard />
-              </ProtectedRoute>
-            } />
-            <Route path="/dashboard/admin" element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <AppContent />
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

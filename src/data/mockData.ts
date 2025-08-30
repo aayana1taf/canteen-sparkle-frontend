@@ -1,3 +1,11 @@
+// Import food images
+import chickenBiryaniImg from '@/assets/food/chicken-biryani.jpg';
+import chickenBurgerImg from '@/assets/food/chicken-burger.jpg';
+import samosasChaatImg from '@/assets/food/samosa-chaat.jpg';
+import clubSandwichImg from '@/assets/food/club-sandwich.jpg';
+import orangeJuiceImg from '@/assets/food/orange-juice.jpg';
+import chickenShawarmaImg from '@/assets/food/chicken-shawarma.jpg';
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -81,6 +89,7 @@ export const menuItems: MenuItem[] = [
     price: 280,
     description: 'Aromatic basmati rice with tender chicken pieces, served with raita and shorba',
     category: 'Main Course',
+    image: chickenBiryaniImg,
     available: true,
     rating: 4.8,
     reviews: 156,
@@ -130,6 +139,7 @@ export const menuItems: MenuItem[] = [
     price: 80,
     description: 'Freshly squeezed orange juice',
     category: 'Beverages',
+    image: orangeJuiceImg,
     available: true,
     rating: 4.5,
     reviews: 67,
@@ -168,6 +178,7 @@ export const menuItems: MenuItem[] = [
     price: 250,
     description: 'Triple-layer sandwich with chicken, cheese, lettuce, and tomatoes',
     category: 'Sandwiches',
+    image: clubSandwichImg,
     available: true,
     rating: 4.6,
     reviews: 142,
@@ -181,6 +192,7 @@ export const menuItems: MenuItem[] = [
     price: 300,
     description: 'Grilled chicken patty with cheese, lettuce, and special sauce',
     category: 'Burgers',
+    image: chickenBurgerImg,
     available: true,
     rating: 4.5,
     reviews: 187,
@@ -255,6 +267,7 @@ export const menuItems: MenuItem[] = [
     price: 120,
     description: 'Crispy samosas topped with yogurt, chutney, and spices',
     category: 'Snacks',
+    image: samosasChaatImg,
     available: true,
     rating: 4.5,
     reviews: 178,
@@ -268,6 +281,7 @@ export const menuItems: MenuItem[] = [
     price: 200,
     description: 'Tender chicken strips with vegetables and garlic sauce in pita bread',
     category: 'Middle Eastern',
+    image: chickenShawarmaImg,
     available: true,
     rating: 4.7,
     reviews: 145,

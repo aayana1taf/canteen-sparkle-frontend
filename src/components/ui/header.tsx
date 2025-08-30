@@ -4,6 +4,7 @@ import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from './button';
 import { Input } from './input';
 import { Badge } from './badge';
+import { ProfileDropdown } from './profile-dropdown';
 
 interface HeaderProps {
   cartItemsCount?: number;
@@ -95,19 +96,23 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
             </Link>
           </nav>
 
-          {/* Cart and Mobile Menu */}
+          {/* Cart, Profile and Mobile Menu */}
           <div className="flex items-center space-x-4">
-            <Button variant="outline" size="sm" className="relative">
-              <ShoppingCart className="h-4 w-4" />
-              {cartItemsCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {cartItemsCount}
-                </Badge>
-              )}
-            </Button>
+            <Link to="/cart">
+              <Button variant="outline" size="sm" className="relative">
+                <ShoppingCart className="h-4 w-4" />
+                {cartItemsCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {cartItemsCount}
+                  </Badge>
+                )}
+              </Button>
+            </Link>
+            
+            <ProfileDropdown />
 
             {/* Mobile Menu Button */}
             <Button
