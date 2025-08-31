@@ -15,7 +15,7 @@ interface CanteenRegistrationProps {
 }
 
 export const CanteenRegistration: React.FC<CanteenRegistrationProps> = ({ onCanteenCreated }) => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   
@@ -81,9 +81,9 @@ export const CanteenRegistration: React.FC<CanteenRegistrationProps> = ({ onCant
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button disabled={profile?.role !== 'admin'}>
           <Plus className="h-4 w-4 mr-2" />
-          Register New Canteen
+          {profile?.role === 'admin' ? 'Register New Canteen' : 'Only Admin Can Register Canteens'}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
