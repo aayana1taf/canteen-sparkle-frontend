@@ -198,18 +198,6 @@ const AuthPage = () => {
                             <span className="text-xs text-muted-foreground">Browse canteens and place orders</span>
                           </div>
                         </SelectItem>
-                        <SelectItem value="canteen_staff">
-                          <div className="flex flex-col">
-                            <span>Canteen Staff</span>
-                            <span className="text-xs text-muted-foreground">Manage your canteen and orders</span>
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="admin">
-                          <div className="flex flex-col">
-                            <span>Administrator</span>
-                            <span className="text-xs text-muted-foreground">Full system administration access</span>
-                          </div>
-                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <p className="text-xs text-muted-foreground">

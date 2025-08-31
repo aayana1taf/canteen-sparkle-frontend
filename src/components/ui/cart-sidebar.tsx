@@ -1,4 +1,5 @@
 import React from 'react';
+import { useCart } from '@/contexts/CartContext';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -27,8 +28,8 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
   onPlaceOrder,
   canteenName
 }) => {
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const { items: cartItems, totalItems, totalAmount } = useCart();
+  const displayItems = cartItems.length > 0 ? cartItems : items;
 
   return (
     <Sheet>
@@ -51,7 +52,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
         </SheetHeader>
 
         <div className="mt-6 space-y-4">
-          {items.length === 0 ? (
+          {displayItems.length === 0 ? (
             <div className="text-center py-8">
               <ShoppingCart className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">Your cart is empty</p>
@@ -59,7 +60,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
           ) : (
             <>
               <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                {items.map((item) => (
+                {displayItems.map((item) => (
                   <Card key={item.id}>
                     <CardContent className="p-4">
                       <div className="flex items-start justify-between">
@@ -111,9 +112,9 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                   onClick={onPlaceOrder} 
                   className="w-full" 
                   size="lg"
-                  disabled={items.length === 0}
+                  disabled={displayItems.length === 0}
                 >
-                  Place Order ({totalItems} items)
+                  {displayItems.length > 0 ? `Place Order (${totalItems} items)` : 'Go to Cart'}
                 </Button>
               </div>
             </>

@@ -1,10 +1,10 @@
-import { useState } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { CartProvider, useCart } from "./contexts/CartContext";
 import Index from "./pages/Index";
 import CanteenPage from "./pages/CanteenPage";
 import AuthPage from "./pages/AuthPage";
@@ -58,30 +58,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// App component with cart state
+// App component with cart context
 const AppContent = () => {
-  // Simple cart state - in a real app, this would be in a context or store
-  const [cartItems, setCartItems] = useState<any[]>([]);
-
-  const updateCartQuantity = (itemId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setCartItems(items => items.filter(item => item.id !== itemId));
-    } else {
-      setCartItems(items => 
-        items.map(item => 
-          item.id === itemId ? { ...item, quantity } : item
-        )
-      );
-    }
-  };
-
-  const clearCart = () => setCartItems([]);
-  
-  const placeOrder = () => {
-    // Handle order placement
-    setCartItems([]);
-    // toast success message
-  };
+  const { items, updateQuantity, clearCart, placeOrder } = useCart();
 
   return (
     <Routes>
@@ -107,8 +86,8 @@ const AppContent = () => {
         path="/cart" 
         element={
           <CartPage 
-            items={cartItems}
-            onUpdateQuantity={updateCartQuantity}
+            items={items}
+            onUpdateQuantity={updateQuantity}
             onClearCart={clearCart}
             onPlaceOrder={placeOrder}
           />
@@ -143,13 +122,15 @@ const AppContent = () => {
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppContent />
-        </BrowserRouter>
-      </TooltipProvider>
+      <CartProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppContent />
+          </BrowserRouter>
+        </TooltipProvider>
+      </CartProvider>
     </AuthProvider>
   </QueryClientProvider>
 );

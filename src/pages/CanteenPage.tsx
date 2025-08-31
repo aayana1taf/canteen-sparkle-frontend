@@ -10,6 +10,7 @@ import { CartSidebar } from '@/components/ui/cart-sidebar';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '@/contexts/CartContext';
 
 interface MenuItem {
   id: string;
@@ -33,23 +34,14 @@ interface Canteen {
   opening_hours?: string;
 }
 
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image?: string;
-  canteenName: string;
-}
-
 export default function CanteenPage() {
   const { canteenId } = useParams<{ canteenId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { user, profile } = useAuth();
+  const { addItem, items: cartItems, totalItems } = useCart();
   const [sortBy, setSortBy] = useState<string>('name');
   const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [canteen, setCanteen] = useState<Canteen | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
@@ -135,122 +127,36 @@ export default function CanteenPage() {
   const addToCart = (item: MenuItem) => {
     if (!user) {
       toast({
-        variant: "destructive",
-        title: "Sign in required",
+        title: "Authentication Required",
         description: "Please sign in to add items to cart",
+        variant: "destructive",
       });
       return;
     }
 
-    setCart(prev => {
-      const existingItem = prev.find(cartItem => cartItem.id === item.id);
-      if (existingItem) {
-        return prev.map(cartItem =>
-          cartItem.id === item.id
-            ? { ...cartItem, quantity: cartItem.quantity + 1 }
-            : cartItem
-        );
-      } else {
-        return [...prev, {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          quantity: 1,
-          image: item.image_url,
-          canteenName: canteen?.name || ''
-        }];
-      }
-    });
-    
-    toast({
-      title: "Added to cart",
-      description: `${item.name} has been added to your cart.`,
+    if (profile?.role !== 'customer') {
+      toast({
+        title: "Access Denied", 
+        description: "Only customers can add items to cart",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image_url,
+      canteenId: canteen?.id || '',
+      canteenName: canteen?.name || ''
     });
   };
-
-  const updateQuantity = (itemId: string, quantity: number) => {
-    if (quantity === 0) {
-      setCart(prev => prev.filter(item => item.id !== itemId));
-    } else {
-      setCart(prev => prev.map(item =>
-        item.id === itemId ? { ...item, quantity } : item
-      ));
-    }
-  };
-
-  const placeOrder = async () => {
-    if (!user || !canteen) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Please sign in to place an order",
-      });
-      return;
-    }
-
-    if (cart.length === 0) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Your cart is empty",
-      });
-      return;
-    }
-
-    try {
-      const totalAmount = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-      
-      // Create order using the database function
-      const { data: orderData, error: orderError } = await supabase
-        .rpc('create_order', {
-          p_customer_id: user.id,
-          p_canteen_id: canteen.id,
-          p_total_amount: totalAmount,
-          p_notes: 'Cash on pickup',
-          p_estimated_pickup_time: new Date(Date.now() + 30 * 60 * 1000).toISOString()
-        });
-
-      if (orderError) throw orderError;
-
-      const orderId = orderData[0].id;
-
-      // Create order items
-      const orderItems = cart.map(item => ({
-        order_id: orderId,
-        menu_item_id: item.id,
-        quantity: item.quantity,
-        unit_price: item.price,
-      }));
-
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) throw itemsError;
-
-      toast({
-        title: "Order placed successfully!",
-        description: `Order #${orderData[0].order_number} has been placed. Cash on pickup.`,
-      });
-
-      setCart([]);
-      navigate('/orders');
-    } catch (error: any) {
-      console.error('Error placing order:', error);
-      toast({
-        variant: "destructive",
-        title: "Failed to place order",
-        description: error.message,
-      });
-    }
-  };
-
-  const cartItemsCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header cartItemsCount={cartItemsCount} />
+        <Header cartItemsCount={totalItems} />
         <div className="container mx-auto px-4 py-12 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
           <p className="text-muted-foreground mt-4">Loading canteen...</p>
@@ -262,7 +168,7 @@ export default function CanteenPage() {
   if (!canteen) {
     return (
       <div className="min-h-screen bg-background">
-        <Header cartItemsCount={cartItemsCount} />
+        <Header cartItemsCount={totalItems} />
         <div className="container mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold text-foreground mb-4">Canteen Not Found</h1>
           <p className="text-muted-foreground">The canteen you're looking for doesn't exist.</p>
@@ -276,7 +182,7 @@ export default function CanteenPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header cartItemsCount={cartItemsCount} />
+      <Header cartItemsCount={totalItems} />
       
       {/* Canteen Header */}
       <section className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground py-12">
@@ -352,7 +258,7 @@ export default function CanteenPage() {
         {filteredAndSortedItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAndSortedItems.map((item) => {
-              const cartItem = cart.find(c => c.id === item.id);
+              const cartItem = cartItems.find(c => c.id === item.id);
               const quantity = cartItem?.quantity || 0;
               
               return (
@@ -372,8 +278,8 @@ export default function CanteenPage() {
                     canteen: 'STUDENT'
                   }}
                   quantity={quantity}
-                  onAddToCart={canAddToCart ? (item: any) => addToCart(item) : undefined}
-                  onUpdateQuantity={canAddToCart ? updateQuantity : undefined}
+                  onAddToCart={canAddToCart ? () => addToCart(item) : undefined}
+                  onUpdateQuantity={canAddToCart ? (_, __) => {} : undefined}
                   showQuantityControls={canAddToCart}
                 />
               );
@@ -405,9 +311,9 @@ export default function CanteenPage() {
       {/* Cart Sidebar - Only for customers */}
       {canAddToCart && (
         <CartSidebar
-          items={cart}
-          onUpdateQuantity={updateQuantity}
-          onPlaceOrder={placeOrder}
+          items={[]}
+          onUpdateQuantity={() => {}}
+          onPlaceOrder={() => navigate('/cart')}
           canteenName={canteen.name}
         />
       )}
