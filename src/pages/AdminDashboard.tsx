@@ -13,7 +13,9 @@ import {
   Building, 
   Package, 
   DollarSign, 
+  TrendingUp,
   UserCheck,
+  ChefHat,
   ShoppingCart
 } from 'lucide-react';
 
@@ -39,7 +41,6 @@ const AdminDashboard = () => {
   });
   const [canteens, setCanteens] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
-  const [canteensLoading, setCanteensLoading] = useState(true);
 
   useEffect(() => {
     fetchAdminStats();
@@ -89,28 +90,16 @@ const AdminDashboard = () => {
   };
 
   const fetchCanteens = async () => {
-    try {
-      setCanteensLoading(true);
-      const { data, error } = await supabase
-        .from('canteens')
-        .select(`
-          *,
-          profiles:staff_user_id(full_name, email)
-        `)
-        .order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('canteens')
+      .select(`
+        *,
+        profiles:staff_user_id(full_name)
+      `)
+      .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error fetching canteens:', error);
-        return;
-      }
-
-      if (data) {
-        setCanteens(data);
-      }
-    } catch (error) {
-      console.error('Error in fetchCanteens:', error);
-    } finally {
-      setCanteensLoading(false);
+    if (data) {
+      setCanteens(data);
     }
   };
 
@@ -135,8 +124,6 @@ const AdminDashboard = () => {
     if (!error) {
       fetchCanteens();
       fetchAdminStats();
-    } else {
-      console.error('Error approving canteen:', error);
     }
   };
 
@@ -247,52 +234,35 @@ const AdminDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                {canteensLoading ? (
-                  <div className="space-y-4">
-                    {[1, 2, 3].map(i => (
-                      <div key={i} className="h-20 bg-muted rounded animate-pulse" />
-                    ))}
-                  </div>
-                ) : canteens.length === 0 ? (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Building className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No canteens found</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {canteens.map((canteen) => (
-                      <div key={canteen.id} className="flex items-center justify-between p-4 border rounded-lg">
-                        <div className="flex-1">
-                          <h3 className="font-semibold">{canteen.name}</h3>
-                          <p className="text-sm text-muted-foreground">{canteen.location}</p>
-                          <p className="text-sm text-muted-foreground">
-                            Staff: {canteen.profiles?.full_name || 'No staff assigned'}
-                            {canteen.profiles?.email && ` (${canteen.profiles.email})`}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Created: {new Date(canteen.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge 
-                            variant={canteen.is_approved ? "default" : "destructive"}
-                            className={canteen.is_approved ? "bg-green-500" : "bg-orange-500"}
-                          >
-                            {canteen.is_approved ? 'Approved' : 'Pending'}
-                          </Badge>
-                          {!canteen.is_approved && (
-                            <Button 
-                              size="sm" 
-                              onClick={() => approveCanteen(canteen.id)}
-                            >
-                              Approve
-                            </Button>
-                          )}
-                        </div>
+                <div className="space-y-4">
+                  {canteens.map((canteen) => (
+                    <div key={canteen.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex-1">
+                        <h3 className="font-semibold">{canteen.name}</h3>
+                        <p className="text-sm text-muted-foreground">{canteen.location}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Staff: {canteen.profiles?.full_name || 'No staff assigned'}
+                        </p>
                       </div>
-                    ))}
-                  </div>
-                )}
+                      <div className="flex items-center gap-2">
+                        <Badge 
+                          variant={canteen.is_approved ? "default" : "destructive"}
+                          className={canteen.is_approved ? "bg-green-500" : "bg-orange-500"}
+                        >
+                          {canteen.is_approved ? 'Approved' : 'Pending'}
+                        </Badge>
+                        {!canteen.is_approved && (
+                          <Button 
+                            size="sm" 
+                            onClick={() => approveCanteen(canteen.id)}
+                          >
+                            Approve
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -368,9 +338,9 @@ const AdminDashboard = () => {
                           {order.status.replace('_', ' ')}
                         </Badge>
                       </div>
-                      <p className="text-sm text-muted-foreground">{order.canteen?.name || 'Unknown Canteen'}</p>
+                      <p className="text-sm text-muted-foreground">{order.canteen.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {order.order_items?.length || 0} items • {new Date(order.created_at).toLocaleString()}
+                        {order.order_items.length} items • {new Date(order.created_at).toLocaleString()}
                       </p>
                     </div>
                     <div className="text-right">
