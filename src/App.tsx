@@ -12,6 +12,9 @@ import OrdersPage from "./pages/OrdersPage";
 import ProfilePage from "./pages/ProfilePage";
 import CustomerDashboard from "./pages/CustomerDashboard";
 import StaffDashboard from "./pages/StaffDashboard";
+import GCRDashboard from "./pages/GCRDashboard";
+import DMSDashboard from "./pages/DMSDashboard";
+import SFCDashboard from "./pages/SFCDashboard";
 import StaffWelcome from "./pages/StaffWelcome";
 import AdminDashboard from "./pages/AdminDashboard";
 import CartPage from "./pages/CartPage";
@@ -101,6 +104,21 @@ const AppContent = () => {
       <Route path="/staff" element={
         <ProtectedRoute>
           <StaffWelcome />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/gcr" element={
+        <ProtectedRoute>
+          <GCRDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/dms" element={
+        <ProtectedRoute>
+          <DMSDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/dashboard/sfc" element={
+        <ProtectedRoute>
+          <SFCDashboard />
         </ProtectedRoute>
       } />
       <Route path="/dashboard/staff" element={

@@ -21,21 +21,21 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 20 14.3% 4.1%;
 
-    /* Primary - Warm Orange for food theme */
-    --primary: 25 95% 53%;
-    --primary-foreground: 60 9.1% 97.8%;
+    /* Primary - Bold Red */
+    --primary: 0 84% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Fresh Green */
-    --secondary: 142 76% 36%;
-    --secondary-foreground: 355.7 100% 97.3%;
+    /* Secondary - Pure White */
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
 
-    /* Muted colors */
-    --muted: 24 5.7% 95.1%;
-    --muted-foreground: 25 5.3% 44.7%;
+    /* Muted colors - Light grays */
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    /* Accent - Vibrant Red for highlights */
-    --accent: 0 84.2% 60.2%;
-    --accent-foreground: 60 9.1% 97.8%;
+    /* Accent - Deep Red */
+    --accent: 0 74% 50%;
+    --accent-foreground: 0 0% 100%;
 
     /* Destructive */
     --destructive: 0 84.2% 60.2%;
@@ -48,23 +48,23 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Custom food theme colors */
-    --gcr: 142 76% 36%;
-    --gcr-foreground: 355.7 100% 97.3%;
-    --dms: 221.2 83.2% 53.3%;
-    --dms-foreground: 210 40% 98%;
-    --sfc: 0 84.2% 60.2%;
-    --sfc-foreground: 60 9.1% 97.8%;
+    /* Custom canteen theme colors - Red variations */
+    --gcr: 0 84% 60%;
+    --gcr-foreground: 0 0% 100%;
+    --dms: 0 74% 50%;
+    --dms-foreground: 0 0% 100%;
+    --sfc: 0 94% 70%; 
+    --sfc-foreground: 0 0% 0%;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(25 95% 53%), hsl(45 93% 58%));
-    --gradient-secondary: linear-gradient(135deg, hsl(142 76% 36%), hsl(122 40% 46%));
-    --gradient-hero: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(45 93% 58%) 50%, hsl(0 84% 60%) 100%);
+    /* Gradients - Red and white theme */
+    --gradient-primary: linear-gradient(135deg, hsl(0 84% 60%), hsl(0 74% 50%));
+    --gradient-secondary: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 95%));
+    --gradient-hero: linear-gradient(135deg, hsl(0 84% 60%) 0%, hsl(0 74% 50%) 50%, hsl(0 94% 70%) 100%);
 
-    /* Shadows */
+    /* Shadows - Red accent shadows */
     --shadow-card: 0 4px 6px -1px hsl(0 0% 0% / 0.1), 0 2px 4px -1px hsl(0 0% 0% / 0.06);
     --shadow-elevated: 0 10px 15px -3px hsl(0 0% 0% / 0.1), 0 4px 6px -2px hsl(0 0% 0% / 0.05);
-    --shadow-food: 0 8px 30px hsl(25 95% 53% / 0.15);
+    --shadow-red: 0 8px 30px hsl(0 84% 60% / 0.15);
 
     /* Animations */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
