@@ -21,41 +21,43 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
   const { profile } = useAuth();
 
   useEffect(() => {
-    const fetchLogo = async () => {
-      const { data } = await supabase
-        .from('admin_settings')
-        .select('setting_value')
-        .eq('setting_key', 'site_logo_url')
-        .single();
-      
+  const fetchLogo = async () => {
+    const { data, error } = await supabase
+      .from('admin_settings')
+      .select('setting_value')
+      .eq('setting_key', 'site_logo_url')
+      .single();
+
+    if (!error) {
       setLogoUrl(data?.setting_value || null);
-    };
+    }
+  };
 
-    fetchLogo();
+  fetchLogo();
 
-    // Listen for real-time logo updates
-    const channel = supabase
-      .channel('admin-settings-changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'admin_settings',
-          filter: 'setting_key=eq.site_logo_url'
-        },
-        (payload) => {
-          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
-            setLogoUrl(payload.new.setting_value || null);
-          }
+  // Listen for real-time changes
+  const channel = supabase
+    .channel('admin-settings-changes')
+    .on(
+      'postgres_changes',
+      {
+        event: '*', // listen to all events
+        schema: 'public',
+        table: 'admin_settings',
+      },
+      (payload) => {
+        // Make sure it's the site logo row
+        if (payload.new?.setting_key === 'site_logo_url') {
+          setLogoUrl(payload.new.setting_value || null);
         }
-      )
-      .subscribe();
+      }
+    )
+    .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
