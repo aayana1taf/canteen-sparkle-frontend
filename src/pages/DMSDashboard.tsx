@@ -8,14 +8,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useOrders, OrderStatus } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from '@/hooks/use-toast';
+import { useRealTimeOrders } from '@/hooks/useRealTimeOrders';
 import { MenuManagement } from '@/components/ui/menu-management';
 import { ChefHat, Clock, DollarSign, Package, TrendingUp, Users, Settings, Store, Utensils } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 const DMSDashboard = () => {
   const { user, profile } = useAuth();
-  const { orders, loading, updateOrderStatus } = useOrders();
+  const { orders, loading, updateOrderStatus, refetch } = useOrders();
   const [canteen, setCanteen] = useState<any>(null);
+
+  // Add real-time updates
+  useRealTimeOrders(() => {
+    refetch();
+  });
 
   useEffect(() => {
     const fetchCanteen = async () => {

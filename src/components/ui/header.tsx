@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, Menu, X } from 'lucide-react';
 import { Button } from './button';
@@ -6,6 +6,7 @@ import { Input } from './input';
 import { Badge } from './badge';
 import { ProfileDropdown } from './profile-dropdown';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface HeaderProps {
   cartItemsCount?: number;
@@ -15,8 +16,46 @@ interface HeaderProps {
 export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const location = useLocation();
   const { profile } = useAuth();
+
+  useEffect(() => {
+    const fetchLogo = async () => {
+      const { data } = await supabase
+        .from('admin_settings')
+        .select('setting_value')
+        .eq('setting_key', 'site_logo_url')
+        .single();
+      
+      setLogoUrl(data?.setting_value || null);
+    };
+
+    fetchLogo();
+
+    // Listen for real-time logo updates
+    const channel = supabase
+      .channel('admin-settings-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'admin_settings',
+          filter: 'setting_key=eq.site_logo_url'
+        },
+        (payload) => {
+          if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {
+            setLogoUrl(payload.new.setting_value || null);
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -31,10 +70,20 @@ export const Header = ({ cartItemsCount = 0, onSearch }: HeaderProps) => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-primary p-2 rounded-lg">
-              <span className="text-primary-foreground font-bold text-xl">NED</span>
-            </div>
-            <span className="text-xl font-bold text-foreground">Canteen</span>
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt="NED Canteen Logo" 
+                className="h-8 w-auto object-contain"
+              />
+            ) : (
+              <>
+                <div className="bg-gradient-primary p-2 rounded-lg">
+                  <span className="text-primary-foreground font-bold text-xl">NED</span>
+                </div>
+                <span className="text-xl font-bold text-foreground">Canteen</span>
+              </>
+            )}
           </Link>
 
           {/* Search Bar - Desktop */}

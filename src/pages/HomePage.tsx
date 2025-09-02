@@ -7,6 +7,7 @@ import { MenuItemCard } from '@/components/ui/menu-item-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
+import { useCart } from '@/contexts/CartContext';
 import heroImage from '@/assets/hero-image.jpg';
 
 interface Canteen {
@@ -34,6 +35,7 @@ export default function HomePage() {
   const [canteens, setCanteens] = useState<Canteen[]>([]);
   const [popularItems, setPopularItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addItem, totalItems } = useCart();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -71,6 +73,36 @@ export default function HomePage() {
     fetchData();
   }, []);
 
+  const handleAddToCart = (item: { 
+    id: string; 
+    name: string; 
+    price: number; 
+    description: string; 
+    category: string; 
+    image?: string; 
+    available: boolean; 
+    rating: number; 
+    reviews: number; 
+    preparationTime: string; 
+    canteen: string; 
+  }) => {
+    const cartItem = {
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      canteenId: '', // We'll need to find canteen ID from the item
+      canteenName: item.canteen
+    };
+    
+    // Find canteen ID based on canteen name
+    const canteen = canteens.find(c => c.name === item.canteen);
+    if (canteen) {
+      cartItem.canteenId = canteen.id;
+      addItem(cartItem);
+    }
+  };
+
   const handleSearch = async (query: string) => {
     if (query.trim()) {
       try {
@@ -99,7 +131,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onSearch={handleSearch} />
+      <Header onSearch={handleSearch} cartItemsCount={totalItems} />
       
       {/* Hero Section */}
       <section 
@@ -155,19 +187,23 @@ export default function HomePage() {
             {searchResults.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {searchResults.map((item) => (
-                  <MenuItemCard key={item.id} item={{
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    description: item.description || '',
-                    category: 'Search Result',
-                    image: item.image_url,
-                    available: true,
-                    rating: item.rating,
-                    reviews: 0,
-                    preparationTime: `${item.preparation_time} mins`,
-                    canteen: item.canteen.name
-                  }} />
+                  <MenuItemCard 
+                    key={item.id} 
+                    item={{
+                      id: item.id,
+                      name: item.name,
+                      price: item.price,
+                      description: item.description || '',
+                      category: 'Search Result',
+                      image: item.image_url,
+                      available: true,
+                      rating: item.rating,
+                      reviews: 0,
+                      preparationTime: `${item.preparation_time} mins`,
+                      canteen: item.canteen.name
+                    }}
+                    onAddToCart={handleAddToCart}
+                  />
                 ))}
               </div>
             ) : (
@@ -195,19 +231,23 @@ export default function HomePage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {popularItems.map((item) => (
-                  <MenuItemCard key={item.id} item={{
-                    id: item.id,
-                    name: item.name,
-                    price: item.price,
-                    description: item.description || '',
-                    category: 'Popular',
-                    image: item.image_url,
-                    available: true,
-                    rating: item.rating,
-                    reviews: 0,
-                    preparationTime: `${item.preparation_time} mins`,
-                    canteen: item.canteen.name
-                  }} />
+                  <MenuItemCard 
+                    key={item.id} 
+                    item={{
+                      id: item.id,
+                      name: item.name,
+                      price: item.price,
+                      description: item.description || '',
+                      category: 'Popular',
+                      image: item.image_url,
+                      available: true,
+                      rating: item.rating,
+                      reviews: 0,
+                      preparationTime: `${item.preparation_time} mins`,
+                      canteen: item.canteen.name
+                    }}
+                    onAddToCart={handleAddToCart}
+                  />
                 ))}
               </div>
             )}

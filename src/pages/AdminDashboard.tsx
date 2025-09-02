@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useOrders } from '@/hooks/useOrders';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { AdminSettings } from '@/components/ui/admin-settings';
 import { 
   Shield, 
   Users, 
@@ -46,7 +47,61 @@ const AdminDashboard = () => {
     fetchAdminStats();
     fetchCanteens();
     fetchUsers();
-  }, []);
+
+    // Set up real-time updates
+    const ordersChannel = supabase
+      .channel('admin-orders-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'orders'
+        },
+        () => {
+          fetchAdminStats();
+        }
+      )
+      .subscribe();
+
+    const canteensChannel = supabase
+      .channel('admin-canteens-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'canteens'
+        },
+        () => {
+          fetchCanteens();
+          fetchAdminStats();
+        }
+      )
+      .subscribe();
+
+    const usersChannel = supabase
+      .channel('admin-users-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'profiles'
+        },
+        () => {
+          fetchUsers();
+          fetchAdminStats();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(ordersChannel);
+      supabase.removeChannel(canteensChannel);
+      supabase.removeChannel(usersChannel);
+    };
+  }, [orders]);
 
   const fetchAdminStats = async () => {
     try {
@@ -220,6 +275,7 @@ const AdminDashboard = () => {
             <TabsTrigger value="canteens">Canteens</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="orders">Recent Orders</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           <TabsContent value="canteens">
@@ -353,6 +409,10 @@ const AdminDashboard = () => {
                 ))}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <AdminSettings />
           </TabsContent>
         </Tabs>
       </main>

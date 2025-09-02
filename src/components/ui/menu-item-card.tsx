@@ -70,7 +70,7 @@ export const MenuItemCard = ({
               {item.name}
             </h3>
             <span className="text-lg font-bold text-primary">
-              ₨{item.price}
+              PKR {item.price}
             </span>
           </div>
 
