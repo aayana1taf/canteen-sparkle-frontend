@@ -113,7 +113,7 @@ const OrdersPage = () => {
                       </CardDescription>
                     </div>
                     <div className="text-right">
-                      <div className="text-2xl font-bold">₹{order.total_amount}</div>
+                      <div className="text-2xl font-bold">PKR {order.total_amount}</div>
                       {order.estimated_pickup_time && (
                         <div className="text-sm text-muted-foreground">
                           Ready by: {formatDate(order.estimated_pickup_time)}
@@ -130,7 +130,7 @@ const OrdersPage = () => {
                         <span>
                           {item.quantity}x {item.menu_item.name}
                         </span>
-                        <span>₹{(item.unit_price * item.quantity).toFixed(2)}</span>
+                        <span>PKR {(item.unit_price * item.quantity).toFixed(2)}</span>
                       </div>
                     ))}
                     

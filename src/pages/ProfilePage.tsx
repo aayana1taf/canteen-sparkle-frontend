@@ -168,7 +168,7 @@ const ProfilePage = () => {
                   <div className="text-sm text-muted-foreground">Total Orders</div>
                 </div>
                 <div className="text-center p-4 bg-muted rounded-lg">
-                  <div className="text-2xl font-bold text-primary">₹0</div>
+                  <div className="text-2xl font-bold text-primary">PKR 0</div>
                   <div className="text-sm text-muted-foreground">Total Spent</div>
                 </div>
               </div>

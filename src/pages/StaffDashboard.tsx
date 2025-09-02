@@ -122,7 +122,7 @@ const StaffDashboard = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rs. {totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">PKR {totalRevenue.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">Completed orders</p>
             </CardContent>
           </Card>
@@ -134,7 +134,7 @@ const StaffDashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                Rs. {totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0.00'}
+                PKR {totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : '0.00'}
               </div>
               <p className="text-xs text-muted-foreground">Per order</p>
             </CardContent>
@@ -178,7 +178,7 @@ const StaffDashboard = () => {
                               {order.status.replace('_', ' ')}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              Rs. {order.total_amount}
+                              PKR {order.total_amount}
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
@@ -210,7 +210,7 @@ const StaffDashboard = () => {
                             {order.order_items.map((item) => (
                               <div key={item.id} className="flex justify-between text-sm">
                                 <span>{item.quantity}x {item.menu_item.name}</span>
-                                <span>Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+                                <span>PKR {(item.quantity * item.unit_price).toFixed(2)}</span>
                               </div>
                             ))}
                           </div>

@@ -59,7 +59,7 @@ const CustomerDashboard = () => {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rs. {totalSpent.toFixed(2)}</div>
+              <div className="text-2xl font-bold">PKR {totalSpent.toFixed(2)}</div>
               <p className="text-xs text-muted-foreground">
                 Across all orders
               </p>
@@ -111,7 +111,7 @@ const CustomerDashboard = () => {
                           </Badge>
                         </div>
                         <p className="text-sm text-muted-foreground">{order.canteen.name}</p>
-                        <p className="text-sm font-medium">Rs. {order.total_amount}</p>
+                        <p className="text-sm font-medium">PKR {order.total_amount}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-muted-foreground">

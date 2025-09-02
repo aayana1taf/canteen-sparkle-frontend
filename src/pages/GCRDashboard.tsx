@@ -115,7 +115,7 @@ const GCRDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-red-100 text-sm">Revenue</p>
-                  <p className="text-2xl font-bold">Rs. {totalRevenue.toFixed(0)}</p>
+                  <p className="text-2xl font-bold">PKR {totalRevenue.toFixed(0)}</p>
                 </div>
                 <DollarSign className="h-6 w-6 text-red-200" />
               </div>
@@ -198,7 +198,7 @@ const GCRDashboard = () => {
                               {order.order_items.map((item) => (
                                 <div key={item.id} className="flex justify-between items-center">
                                   <span className="font-medium">{item.quantity}x {item.menu_item.name}</span>
-                                  <span className="font-semibold text-primary">Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+                                  <span className="font-semibold text-primary">PKR {(item.quantity * item.unit_price).toFixed(2)}</span>
                                 </div>
                               ))}
                             </div>

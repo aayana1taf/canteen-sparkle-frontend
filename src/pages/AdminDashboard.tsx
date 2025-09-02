@@ -199,7 +199,7 @@ const AdminDashboard = () => {
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">Rs. {stats.totalRevenue.toFixed(2)}</div>
+              <div className="text-2xl font-bold">PKR {stats.totalRevenue.toFixed(2)}</div>
             </CardContent>
           </Card>
 
@@ -344,7 +344,7 @@ const AdminDashboard = () => {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">Rs. {order.total_amount}</p>
+                      <p className="font-semibold">PKR {order.total_amount}</p>
                       <p className="text-xs text-muted-foreground">
                         Customer Order
                       </p>

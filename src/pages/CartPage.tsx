@@ -120,7 +120,7 @@ const CartPage: React.FC<CartPageProps> = ({
                         {item.canteenName}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        ₹{item.price} each
+                        PKR {item.price} each
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
@@ -143,7 +143,7 @@ const CartPage: React.FC<CartPageProps> = ({
                       </Button>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">₹{(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="font-medium">PKR {(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -160,16 +160,16 @@ const CartPage: React.FC<CartPageProps> = ({
               <CardContent className="space-y-4">
                 <div className="flex justify-between">
                   <span>Subtotal ({totalItems} items)</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>PKR {totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Delivery Fee</span>
-                  <span>₹0.00</span>
+                  <span>PKR 0.00</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>PKR {totalAmount.toFixed(2)}</span>
                 </div>
                 
                 <Button 

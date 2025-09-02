@@ -67,7 +67,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                         <div className="flex-1">
                           <h4 className="font-medium">{item.name}</h4>
                           <p className="text-sm text-muted-foreground">
-                            ₹{item.price} each
+                            PKR {item.price} each
                           </p>
                         </div>
                         <div className="flex items-center space-x-2">
@@ -92,7 +92,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
                       </div>
                       <div className="mt-2 flex justify-between items-center">
                         <span className="text-sm text-muted-foreground">
-                          Subtotal: ₹{(item.price * item.quantity).toFixed(2)}
+                          Subtotal: PKR {(item.price * item.quantity).toFixed(2)}
                         </span>
                       </div>
                     </CardContent>
@@ -105,7 +105,7 @@ export const CartSidebar: React.FC<CartSidebarProps> = ({
               <div className="space-y-4">
                 <div className="flex justify-between items-center font-semibold text-lg">
                   <span>Total</span>
-                  <span>₹{totalAmount.toFixed(2)}</span>
+                  <span>PKR {totalAmount.toFixed(2)}</span>
                 </div>
 
                 <Button 

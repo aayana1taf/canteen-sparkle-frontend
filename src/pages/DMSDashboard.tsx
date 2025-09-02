@@ -115,7 +115,7 @@ const DMSDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-rose-100 text-sm font-medium">Revenue</p>
-                  <p className="text-2xl font-bold">Rs. {totalRevenue.toFixed(0)}</p>
+                  <p className="text-2xl font-bold">PKR {totalRevenue.toFixed(0)}</p>
                 </div>
                 <DollarSign className="h-6 w-6 text-rose-200" />
               </div>
@@ -201,7 +201,7 @@ const DMSDashboard = () => {
                               {order.order_items.map((item) => (
                                 <div key={item.id} className="flex justify-between items-center p-2 bg-rose-50 rounded-lg">
                                   <span className="font-semibold text-gray-800">{item.quantity}x {item.menu_item.name}</span>
-                                  <span className="font-bold text-rose-600">Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+                                  <span className="font-bold text-rose-600">PKR {(item.quantity * item.unit_price).toFixed(2)}</span>
                                 </div>
                               ))}
                             </div>

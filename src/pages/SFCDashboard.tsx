@@ -115,7 +115,7 @@ const SFCDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-red-100 text-sm font-semibold">Revenue</p>
-                  <p className="text-3xl font-bold">Rs. {totalRevenue.toFixed(0)}</p>
+                  <p className="text-3xl font-bold">PKR {totalRevenue.toFixed(0)}</p>
                 </div>
                 <DollarSign className="h-8 w-8 text-red-200" />
               </div>
@@ -201,7 +201,7 @@ const SFCDashboard = () => {
                               {order.order_items.map((item) => (
                                 <div key={item.id} className="flex justify-between items-center p-3 bg-red-50 rounded-xl border border-red-200">
                                   <span className="font-bold text-lg text-gray-800">{item.quantity}x {item.menu_item.name}</span>
-                                  <span className="font-bold text-xl text-red-600">Rs. {(item.quantity * item.unit_price).toFixed(2)}</span>
+                                  <span className="font-bold text-xl text-red-600">PKR {(item.quantity * item.unit_price).toFixed(2)}</span>
                                 </div>
                               ))}
                             </div>
